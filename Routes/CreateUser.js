@@ -57,7 +57,7 @@ router.post("/doctorAppointments", async (req, res) => {
   }
 });
 router.post("/getDoctor", async (req, res) => {
-  const { cityName } = req.body; // Read cityName from the body
+  const { cityName } = req.body;
 
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -72,7 +72,6 @@ router.post("/getDoctor", async (req, res) => {
       });
     }
 
-    // Find doctors by cityName (case-insensitive)
     const doctors = await Doctor.find({
       cityName: { $regex: new RegExp(`^${cityName}$`, "i") },
     });
@@ -106,7 +105,6 @@ router.post(
         throw new Error("MongoDB connection not established");
       }
 
-      // Create the appointment
       await Appointment.create({
         patientUserName,
         doctorUserName,
@@ -145,7 +143,6 @@ router.post(
         throw new Error("MongoDB connection not established");
       }
 
-      // Check if email already exists
       const existingEmail = await User.findOne({ email });
       if (existingEmail) {
         return res.status(400).json({
@@ -154,7 +151,7 @@ router.post(
         });
       }
 
-      // Check if name already exists
+
       const existingName = await User.findOne({ userName });
       if (existingName) {
         return res.status(400).json({
@@ -234,7 +231,6 @@ router.post(
         });
       }
 
-      // Check if name already exists
       const existingName = await User.findOne({ userName });
       if (existingName) {
         return res.status(400).json({
@@ -250,7 +246,6 @@ router.post(
         });
       }
 
-      // Check if name already exists
       const existingName2 = await Doctor.findOne({ userName });
       if (existingName2) {
         return res.status(400).json({
@@ -306,7 +301,6 @@ router.post("/flightsdata", (req, res) => {
 });
 router.post("/create", async (req, res) => {
   try {
-    // Logic for creating a user
     res.status(201).send("User created");
   } catch (error) {
     console.error(error.message);
@@ -379,7 +373,6 @@ router.post(
 );
 router.post("/create", async (req, res) => {
   try {
-    // Logic for creating a user
     res.status(201).send("User created");
   } catch (error) {
     console.error(error.message);
@@ -410,8 +403,6 @@ router.get("/doctorProfile", authenticateToken, async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
-
-// Middleware to authenticate token
 function authenticateToken(req, res, next) {
   const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) return res.sendStatus(401);
