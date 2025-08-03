@@ -1,15 +1,40 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const Donor=require("../models/Donor");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const flights = require("../models/flights");
 const Doctor = require("../models/Doctor");
 const Appointment = require("../models/Appointment"); 
 const jwtSecret = "MynameisRamukumar";
+const Razorpay = require("razorpay");
+router.post("/generateOrderId", async (req, res) => {
+  try {
+    const options = {
+      amount: req.body.amount * 100,
+      currency: "INR",
+      payment_capture: 1,
+    };
+
+    const razorpay = new Razorpay({
+      key_id: "",
+      key_secret: "",
+    });
+
+    const order = await razorpay.orders.create(options);
+    res.status(200).json({
+      success: true,
+      orderId: order.id,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      error: "Failed to generate order ID",
+    });
+  }
+});
 
 
 router.post("/myAppoinments", async (req, res) => {
@@ -57,21 +82,26 @@ router.post("/doctorAppointments", async (req, res) => {
   }
 });
 router.post("/getDoctor", async (req, res) => {
+<<<<<<< HEAD
   const { cityName } = req.body;
+=======
+  const { cityName } = req.body; 
+>>>>>>> 9eee60d (razorpay update)
 
   try {
     if (mongoose.connection.readyState !== 1) {
       throw new Error("MongoDB connection not established");
     }
-
-    // Make sure cityName is provided
     if (!cityName) {
       return res.status(400).json({
         success: false,
         error: "cityName is required",
       });
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9eee60d (razorpay update)
     const doctors = await Doctor.find({
       cityName: { $regex: new RegExp(`^${cityName}$`, "i") },
     });
@@ -104,7 +134,10 @@ router.post(
       if (mongoose.connection.readyState !== 1) {
         throw new Error("MongoDB connection not established");
       }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9eee60d (razorpay update)
       await Appointment.create({
         patientUserName,
         doctorUserName,
@@ -142,7 +175,10 @@ router.post(
       if (mongoose.connection.readyState !== 1) {
         throw new Error("MongoDB connection not established");
       }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9eee60d (razorpay update)
       const existingEmail = await User.findOne({ email });
       if (existingEmail) {
         return res.status(400).json({
@@ -151,7 +187,10 @@ router.post(
         });
       }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9eee60d (razorpay update)
       const existingName = await User.findOne({ userName });
       if (existingName) {
         return res.status(400).json({
@@ -307,70 +346,7 @@ router.post("/create", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-router.post(
-  "/beDonar",
-  [
-    body("name").notEmpty().withMessage("to  required"),
-    body("bloodGroup").notEmpty().withMessage("from required"),
-    body("phoneNumber").notEmpty().withMessage("from required"),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
-    }
 
-    const { name, bloodGroup,phoneNumber } = req.body;
-
-    try {
-      if (mongoose.connection.readyState !== 1) {
-        throw new Error("MongoDB connection not established");
-      }
-      await Donor.create({
-        name,
-        bloodGroup,
-        phoneNumber
-        
-      });
-
-      res.status(200).json({ success: true });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ success: false, error: "Server error" });
-    }
-  }
-);
-router.post(
-  "/flights",
-  [
-    body("to").notEmpty().withMessage("to  required"),
-    body("from").notEmpty().withMessage("from required"),
-    
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
-    }
-
-    const { to, from} = req.body;
-
-    try {
-      if (mongoose.connection.readyState !== 1) {
-        throw new Error("MongoDB connection not established");
-      }
-      await flights.create({
-        to,
-        from
-      });
-
-      res.status(200).json({ success: true });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ success: false, error: "Server error" });
-    }
-  }
-);
 router.post("/create", async (req, res) => {
   try {
     res.status(201).send("User created");
